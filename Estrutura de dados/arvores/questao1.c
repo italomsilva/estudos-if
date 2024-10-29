@@ -29,12 +29,8 @@ void pre(Arv *a)
 {
     if (a != NULL)
     {
-        printf("%d", a->info);
-        if (a->esq != NULL || a->dir != NULL)
-            printf(" ");
+        printf(" %d", a->info);
         pre(a->esq);
-        if (a->esq != NULL && a->dir != NULL)
-            printf(" ");
         pre(a->dir);
     }
 }
@@ -43,9 +39,7 @@ void in(Arv *a)
     if (a != NULL)
     {
         in(a->esq);
-        printf("%d", a->info);
-        if (a->dir != NULL)
-            printf(" ");
+        printf(" %d", a->info);
         in(a->dir);
     }
 }
@@ -55,10 +49,8 @@ void pos(Arv *a)
     {
         pos(a->esq);
         pos(a->dir);
-        printf("%d", a->info);
+        printf(" %d", a->info);
         // verifica se tem a esquerda ou a direita antes
-        if (a->dir != NULL || a->esq != NULL)
-            printf(" ");
     }
 }
 
@@ -79,7 +71,6 @@ int main()
 
     for (int i = 0; i < C; i++)
     {
-        printf("\n");
         N = 0;
         // garantindo q N não será negativo e será menor q quinhentos
         while (N < 1 || N > 500)
@@ -100,23 +91,26 @@ int main()
                     if (valores[j] == valores[k])
                     {
                         valores[j] = -1;
-                    } else {
-                        break;
                     }
                 }
             }
             // inserindo
             floresta[i] = ins_abb(valores[j], floresta[i]);
         }
+    }
+
+    for (int i = 0; i < C; i++)
+    {
         printf("Case %d:\n", i + 1);
-        printf("Pre.: ");
+        printf("Pre.:");
         pre(floresta[i]);
         printf("\n");
-        printf("In..: ");
+        printf("In..:");
         in(floresta[i]);
         printf("\n");
-        printf("Post: ");
+        printf("Post:");
         pos(floresta[i]);
+        printf("\n");
         printf("\n");
     }
 }
