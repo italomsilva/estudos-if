@@ -3,68 +3,133 @@
 
 typedef struct arv
 {
-    int info;
-    struct arv *dir;
+    int valor;
     struct arv *esq;
+    struct arv *dir;
 } Arv;
-typedef Arv *Parv;
-Parv ins(Parv a, int n)
+
+typedef struct noFila
 {
-    if (a == NULL)
+    Arv *noArv;
+    struct noFila *prox;
+} NoFila;
+
+typedef struct Fila
+{
+    NoFila *inicio;
+    NoFila *fim;
+} Fila;
+
+Arv *criar_noArv(int valor)
+{
+    Arv *a = (Arv *)malloc(sizeof(Arv));
+    a->valor = valor;
+    a->esq = a->dir = NULL;
+    return a;
+}
+
+Arv *ins(Arv *raiz, int valor)
+{
+    if (raiz == NULL)
+        return criar_noArv(valor);
+    if (valor < (raiz->valor))
+        raiz->esq = ins(raiz->esq, valor);
+    else
+        raiz->dir = ins(raiz->dir, valor);
+    return raiz;
+}
+
+Fila *criar_fila()
+{
+    Fila *fila = (Fila *)malloc(sizeof(Fila));
+    fila->inicio = fila->fim = NULL;
+    return fila;
+}
+
+int fila_vazia(Fila *fila)
+{
+    return fila->inicio == NULL;
+}
+
+void enfileirar(Fila *fila, Arv *no)
+{
+    NoFila *novoNoFila = (NoFila *)malloc(sizeof(NoFila));
+    novoNoFila->noArv = no;
+    novoNoFila->prox = NULL;
+
+    if (fila->fim != NULL)
     {
-        Parv novo = (Parv)malloc(sizeof(Arv));
-        novo->info = n;
-        novo->esq = novo->dir = NULL;
-        return novo;
-    }
-    if (n < (a->info))
-    {
-        a->esq = ins(a->esq, n);
+        fila->fim->prox = novoNoFila;
     }
     else
     {
-        a->dir = ins(a->dir, n);
+        fila->inicio = novoNoFila;
     }
-    return a;
-};
+    fila->fim = novoNoFila;
+}
+
+Arv *desenfileirar(Fila *fila)
+{
+    if (fila_vazia(fila))
+        return NULL;
+
+    NoFila *temp = fila->inicio;
+    Arv *noArvore = temp->noArv;
+    fila->inicio = temp->prox;
+
+    if (fila->inicio == NULL)
+    {
+        fila->fim = NULL;
+    }
+
+    free(temp);
+    return noArvore;
+}
+
+void percurso_nivel(Arv *raiz)
+{
+    if (raiz != NULL)
+    {
+        Fila *fila = criar_fila();
+        enfileirar(fila, raiz);
+
+        while (!fila_vazia(fila))
+        {
+            Arv *atual = desenfileirar(fila);
+            printf("%d", atual->valor);
+
+            if (atual->esq != NULL)
+                enfileirar(fila, atual->esq);
+            if (atual->dir != NULL)
+                enfileirar(fila, atual->dir);
+
+            if (!fila_vazia(fila))
+                printf(" ");
+        }
+    }
+}
 
 int main()
 {
-    int C;
-    do
-    {
-        scanf("%d", &C);
-    } while (C > 1000);
+    int casos;
+    scanf("%d", &casos);
 
-    for (int i = 1; i <= C; i++)
+    for (int i = 1; i <= casos; i++)
     {
-        int N;
-        do
-        {
-            scanf("%d", &N);
-        } while (C<1 || C > 1000);
+        int quantidade;
+        scanf("%d", &quantidade);
 
-        printf("Case %d:\n", i);
-        int vetor[N];
-        for (int j = 0; j < N; j++)
+        Arv *raiz = NULL;
+
+        for (int j = 0; j < quantidade; j++)
         {
-            vetor[j]=-1;
-            while (vetor[j]<0)
-            {
-                scanf("%d", &vetor[j]);
-                for (int k = 0; k < j; k++)
-                {
-                    if (vetor[j]==vetor[k])
-                    {
-                        vetor[j]=-1;
-                    }
-                    
-                }
-            }
-            
-            
+            int valor;
+            scanf("%d", &valor);
+            raiz = ins(raiz, valor);
         }
-        
+        printf("Case %d:\n", i);
+        percurso_nivel(raiz);
+        printf("\n\n");
     }
 
     return 0;
